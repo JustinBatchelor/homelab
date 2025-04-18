@@ -61,6 +61,18 @@
                 value: "cloudflare_api_token"
               - name: lvmstorage.enabled
                 value: "false"
+              - name: nfs.enabled
+                value: 'true'
+              - name: nfs.namespace
+                value: "nfs"
+              - name: nfs.server
+                value: "pve2.batchelor.live"
+              - name: nfs.path
+                value: "/nfs/storage-class"
+              - name: nfs.provisioner.name
+                value: "nfs-storage"
+              - name: nfs.provisioner.service_account
+                value: "nfs-client-proivisioner"
               - name: aap.enabled
                 value: "false"
               - name: ocpVirtualization.enabled
