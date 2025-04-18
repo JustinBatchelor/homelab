@@ -4,7 +4,7 @@ resources:
   # install cert-manager
   - ../operators/cert-manager/
   # install lvm-storage
-  - ../operators/lvm-storage/
+  # - ../operators/lvm-storage/
   # install vault-secrets
   - ../operators/vault-secrets/
   # install ansible-automation-platform
