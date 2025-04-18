@@ -72,7 +72,7 @@
               - name: nfs.provisioner.name
                 value: "nfs-storage"
               - name: nfs.provisioner.service_account
-                value: "nfs-client-proivisioner"
+                value: "nfs-client-provisioner"
               - name: aap.enabled
                 value: "false"
               - name: ocpVirtualization.enabled
