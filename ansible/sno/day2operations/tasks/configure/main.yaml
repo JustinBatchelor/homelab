@@ -60,9 +60,9 @@
               - name: vaultSecrets.app.key
                 value: "cloudflare_api_token"
               - name: lvmstorage.enabled
-                value: "true"
+                value: "false"
               - name: aap.enabled
-                value: "true"
+                value: "false"
               - name: ocpVirtualization.enabled
                 value: "false"
         destination:
