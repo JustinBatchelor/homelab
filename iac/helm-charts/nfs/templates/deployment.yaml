@@ -6,7 +6,7 @@ metadata:
   labels:
     app: nfs-client-provisioner
   # replace with namespace where provisioner is deployed
-  namespace: nfs
+  namespace: {{ .Values.namespace | default "nfs" }}
 spec:
   replicas: 1
   strategy:
@@ -19,7 +19,7 @@ spec:
       labels:
         app: nfs-client-provisioner
     spec:
-      serviceAccountName: nfs-client-provisioner
+      serviceAccountName: {{ .Values.provisioner.service_account }}
       containers:
         - name: nfs-client-provisioner
           image: registry.k8s.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2
@@ -28,14 +28,14 @@ spec:
               mountPath: /persistentvolumes
           env:
             - name: PROVISIONER_NAME
-              value: nfs-storage
+              value: {{ .Values.provisioner.name }}
             - name: NFS_SERVER
-              value: pve2.batchelor.live
+              value: {{ .Values.nfs.server }}
             - name: NFS_PATH
-              value: /nfs/storage-class
+              value: {{ .Values.nfs.path }}
       volumes:
         - name: nfs-client-root
           nfs:
-            server: pve2.batchelor.live
-            path: /nfs/storage-class
-
+            server: {{ .Values.nfs.server }}
+            path: {{ .Values.nfs.path }}
+---
