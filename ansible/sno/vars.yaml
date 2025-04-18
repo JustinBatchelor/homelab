@@ -14,6 +14,11 @@ operator_instance_repo:
   name: 'iac-operator-instances-argocd'
   namespace: 'openshift-gitops'
 
+nfs_iac_repo:
+  url: 'https://github.com/JustinBatchelor/homelab.git'
+  path: 'iac/helm-charts/nfs'
+  name: 'iac-nfs-provisioner'
+  namespace: 'openshift-gitops'
 
 # local user of the system.. used to set permissions when templating files
 local_user: jbatchel # <--- change this to your local user
