@@ -20,6 +20,14 @@ nfs_iac_repo:
   name: 'iac-nfs-provisioner'
   namespace: 'openshift-gitops'
 
+applications:
+  openwebui:
+    url: https://github.com/JustinBatchelor/homelab.git
+    path: iac/helm-charts/openweb-ui
+    name: openweb-ui
+    namespace: openshift-gitops
+
+
 # local user of the system.. used to set permissions when templating files
 local_user: jbatchel # <--- change this to your local user
 local_group: jbatchel # <--- change this to your local group

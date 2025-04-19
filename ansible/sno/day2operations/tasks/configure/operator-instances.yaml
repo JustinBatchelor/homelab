@@ -1,0 +1,125 @@
+- name: Patch certmanagers.operator.openshift.io to support dns validation
+  kubernetes.core.k8s:
+    state: patched
+    api_version: operator.openshift.io/v1alpha1
+    kind: CertManager
+    name: cluster
+    namespace: cert-manager-operator
+    merge_type: 
+      - merge
+    definition:
+      spec:
+        unsupportedConfigOverrides:
+          controller:
+            args: 
+              - "--dns01-recursive-nameservers=1.1.1.1:53,8.8.8.8:53"
+              - "--dns01-recursive-nameservers-only"
+
+- name: Ensure the OpenShift GitOps Operator Instance ArgoCD Application exists
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: '{{ operator_instance_repo["name"] }}'
+        namespace: '{{ operator_instance_repo["namespace"] }}'
+      spec:
+        project: default
+        source:
+          repoURL: '{{ operator_instance_repo["url"] }}'
+          targetRevision: HEAD
+          path: ./
+          helm:
+            parameters:
+              - name: clusterName
+                value: '{{ cluster_name }}'
+              - name: clusterDomain
+                value: '{{ base_dns_domain }}'
+              - name: email
+                value: "justinrossbatchelor@gmail.com"
+              - name: certManager.enabled
+                value: "true"
+              - name: certManager.ingressCertificate.enabled
+                value: "true"
+              - name: vaultSecrets.enabled
+                value: "true"
+              - name: vaultSecrets.organizationID
+                value: "{{ lookup('env', 'organizationID') }}"
+              - name: vaultSecrets.projectID
+                value: "{{ lookup('env', 'projectID') }}"
+              - name: vaultSecrets.servicePrincipal.clientID
+                value: "{{ lookup('env', 'clientID') | b64encode }}"
+              - name: vaultSecrets.servicePrincipal.clientSecret
+                value: "{{ lookup('env', 'clientSecret') | b64encode }}"
+              - name: vaultSecrets.servicePrincipal.name
+                value: "hcp-service-principal"
+              - name: vaultSecrets.app.name
+                value: "homelab"
+              - name: vaultSecrets.app.key
+                value: "cloudflare_api_token"
+              - name: lvmstorage.enabled
+                value: "false"
+              - name: nfs.enabled
+                value: 'true'
+              - name: nfs.namespace
+                value: "nfs"
+              - name: nfs.server
+                value: "pve2.batchelor.live"
+              - name: nfs.path
+                value: "/nfs/storage-class"
+              - name: nfs.provisioner.name
+                value: "nfs-storage"
+              - name: nfs.provisioner.service_account
+                value: "nfs-client-provisioner"
+              - name: aap.enabled
+                value: "false"
+              - name: ocpVirtualization.enabled
+                value: "false"
+        destination:
+          server: https://kubernetes.default.svc
+          namespace: default
+        syncPolicy:
+          automated:
+            prune: true
+            selfHeal: true
+          syncOptions:
+            - CreateNamespace=true
+
+- name: Wait for Operator Instance ArgoCD Application to exist
+  kubernetes.core.k8s_info:
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: '{{ operator_instance_repo["name"] }}'
+    namespace: '{{ operator_instance_repo["namespace"] }}'
+  register: argocd_operator_instance_object
+  retries: 30
+  delay: 10
+  until: argocd_operator_instance_object.resources | length > 0
+
+- name: Wait until Operator Instance ArgoCD Application status.health.status is 'Healthy'
+  kubernetes.core.k8s_info:
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: '{{ operator_instance_repo["name"] }}'
+    namespace: '{{ operator_instance_repo["namespace"] }}'
+  register: argocd_operator_instance
+  retries: 30
+  delay: 10
+  until: 
+    - argocd_operator_instance.resources[0].status.health.status is defined 
+    - argocd_operator_instance.resources[0].status.health.status == 'Healthy'
+
+- name: Patch ingresscontroller.operator default
+  kubernetes.core.k8s:
+    state: patched
+    api_version: operator.openshift.io/v1
+    kind: IngressController
+    name: default
+    namespace: openshift-ingress-operator
+    merge_type: 
+      - merge
+    definition:
+      spec:
+        defaultCertificate:
+          name: "ingress-certificate-secret"

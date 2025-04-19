@@ -1,0 +1,25 @@
+---
+- name: Deploy / update ArgoCD Application (OpenWeb-UI)
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: "{{ applications.openwebui.name }}"
+        namespace: "{{ applications.openwebui.namespace }}"
+      spec:
+        project: default
+        source:
+          repoURL: "{{ applications.openwebui.url }}"
+          targetRevision: HEAD
+          path: "{{ applications.openwebui.path }}"
+        destination:
+          server: https://kubernetes.default.svc
+          namespace: default
+        syncPolicy:
+          automated:
+            prune: true
+            selfHeal: true
+          syncOptions:
+            - CreateNamespace=true
