@@ -4,7 +4,7 @@ resources:
   # install cert-manager
   - ../operators/cert-manager/
   # install rh-sso
-  # - ../operators/rh-sso/
+  - ../operators/rh-sso/
   # install vault-secrets
   - ../operators/vault-secrets/
   # install ansible-automation-platform
