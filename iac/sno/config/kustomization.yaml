@@ -3,11 +3,13 @@ kind: Kustomization
 resources:
   # install cert-manager
   - ../operators/cert-manager/
-  # install lvm-storage
-  # - ../operators/lvm-storage/
+  # install rh-sso
+  - ../operators/rh-sso/
   # install vault-secrets
   - ../operators/vault-secrets/
   # install ansible-automation-platform
   - ../operators/aap/
   # install openshift-virtualization
   # - ../operators/ocp-virt/
+  # install lvm-storage
+  # - ../operators/lvm-storage/
