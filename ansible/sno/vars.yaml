@@ -80,10 +80,8 @@ cluster_resources:
   storage:
     disk:
       - name: scsi0
-        size: 300
-        format: '{{ storage_type }}:{{ storage_size_gb }}'
-      - name: scsi1
         size: 500
+        format: '{{ storage_type }}:{{ storage_size_gb }}'
   memory:
     size_mb: 64000
   cpu:
